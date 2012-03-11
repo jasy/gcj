@@ -1,72 +1,31 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <list>
-using namespace std;
 
-static void get_num( int* w, int* q, int* n )
+static void get_extxt( std::vector<std::string>& v )
 {
-	string str;
-	getline( cin, str );
-	vector<int> v;
-	const int len = str.length();
-	int number=0;
-	for (int i=0; i < len; ++i) {
-		if ( str[i] == ' ' ) {
-			v.push_back( number );
-			number = 0;
-			continue;
-		}
-		number = number*10+(str[i]-'0');
-	}
-	*w = v[0];
-	*q = v[1];
-	*n = number;
+    std::string str;
+    std::cin >> str;
+    const int len = str.length();
+    for (int i=0; i<len; ++i) {
+        int base = i;
+        int subs = 1;
+        if (str[i] == '(') {
+            const int b = str.find( ')', i+1 );
+            subs = b-i-1;
+            base = i+1;
+            i = b;
+        }
+        v.push_back(str.substr(base, subs));
+    }
 }
 
-static void get_txt( const int n, list<string>& c ) 
-{
-	string str;
-	for (int i=0; i<n; ++i) {
-		getline( cin, str );
-		c.push_back(str);
-	}
-}
-
-static void get_extxt( const int n, list< list<string> >& c )
-{
-	list<string> txt_list;
-	get_txt( n, txt_list );
-	typedef list<string>::iterator Iter;
-	Iter end=txt_list.end();
-	for (Iter it=txt_list.begin(); it!=end; ++it) {
-		list<string> v;
-		string& str = *it;
-		const int len = str.length();
-		for (int i=0; i<len; ++i) {
-			int base = i;
-			int subs = 1;
-			if (str[i] == '(') {
-				const int b = str.find( ')', i+1 );
-				subs = b-i-1;
-				base = i+1;
-				i = b;
-			}
-			v.push_back(str.substr(base, subs));
-		}
-		c.push_back(v);
-	}
-}
-
-static bool check_match( string& txt, list<string>& extxt )
+static bool check_match( const std::string& txt, const std::vector<std::string>& extxt )
 {
 	bool match = true;
-	typedef list<string>::iterator Iter;
-	Iter end = extxt.end();
-	int i=0;
-	for (Iter it=extxt.begin(); it!=end; ++it,++i) {
-		string& str = *it;
-		if( string::npos == str.find(txt[i]) )
+	const int n = txt.length();
+	for (int i=0; i<n; ++i) {
+		if( std::string::npos == extxt[i].find(txt[i]) )
 		{
 			match = false;
 			break;
@@ -75,13 +34,13 @@ static bool check_match( string& txt, list<string>& extxt )
 	return match;
 }
 
-static int count_match( list<string>& txt_list, list<string>& extxt )
+static int count_match( const std::vector<std::string>& txt_list )
 {
+    std::vector<std::string> extxt;
+    get_extxt(extxt);
 	int n = 0;
-	typedef list<string>::iterator Iter;
-	Iter end = txt_list.end();
-	for (Iter it=txt_list.begin(); it!=end; ++it) {
-		if (check_match(*it, extxt)) {
+	for (auto& v: txt_list) {
+		if (check_match(v, extxt)) {
 			++n;
 		}
 	}
@@ -89,19 +48,14 @@ static int count_match( list<string>& txt_list, list<string>& extxt )
 }
 
 int main () {
-	int w = 0;
-	int q = 0;
-	int n = 0;
-	list<string> txt_list;
-	list< list<string> > ex_txt;
-	get_num( &w, &q, &n );
-	get_txt( q, txt_list );
-	get_extxt( n, ex_txt );
-	int i=1;
-	typedef list< list<string> >::iterator Iter;
-	Iter end = ex_txt.end();
-	for (Iter it=ex_txt.begin(); it!=end; ++it,++i) {
-		cout << "Case #" << i << ": " << count_match(txt_list, *it) << "\n";
+	int L,D,N;
+    std::cin >> L >> D >> N;
+    std::vector<std::string> txt_list(D);
+	for (int i=0; i<D; ++i) {
+        std::cin >> txt_list[i];
+    }
+	for (int i=1; i<=N; ++i) {
+        std::cout << "Case #" << i << ": " << count_match(txt_list) << "\n";
 	}
     return 0;
 }
