@@ -3,12 +3,6 @@
 #include <vector>
 #include <algorithm>
 
-struct pair_less {
-	bool operator()(const std::pair<int,int>& x, const std::pair<int,int>& y) const {
-		return x.first < y.first;
-	}
-};
-
 static int solve() {
 	int N;
 	std::cin >> N;
@@ -16,7 +10,7 @@ static int solve() {
 	for (int i=0; i<N; ++i) {
 		std::cin >> v[i].first >> v[i].second;
 	}
-	std::sort( v.begin(), v.end(), pair_less() );
+	std::sort( v.begin(), v.end() );
 	int n=0;
 	for (int i=0; i<N; ++i) {
 		for (int j=i+1; j<N; ++j) {
@@ -34,5 +28,5 @@ int main () {
 	for (int x=1; x<=T; ++x) {
 		std::cout << "Case #" << x << ": " << solve() << "\n";
 	}
-    return 0;
+	return 0;
 }
