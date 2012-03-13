@@ -2,17 +2,14 @@
 #include <string>
 
 int main () {
-    int T;
+	int T;
 	std::cin >> T;
 	for (int x=1; x<=T; ++x) {
 		unsigned long N,K;
 		std::cin >> N >> K;
-		unsigned long l = 0;
-		for (int i=0; i<N; ++i) {
-			l |= 1<<i;
-		}
+		unsigned long l = (1ul<<N)-1;
 		std::string y = (K & l)==l? "ON": "OFF";
 		std::cout << "Case #" << x << ": " << y << "\n";
 	}
-    return 0;
+	return 0;
 }
