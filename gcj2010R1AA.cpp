@@ -11,19 +11,6 @@ static void ini( const int N, char p[MAX][MAX] ) {
 	}
 }
 
-static void grv( const int N, const char b[MAX][MAX], char c[MAX][MAX] ) {
-	ini( N, c );
-	for (int i=0; i<N; ++i) {
-		int n=0;
-		for (int j=0; j<N; ++j) {
-			if( b[i][j] != '.' ) {
-				c[i][n] = b[i][j];
-				++n;
-			}
-		}
-	}
-}
-
 static void rotgrv( const int N, const char b[MAX][MAX], char c[MAX][MAX] ) {
 	ini( N, c );
 	for (int y=0; y<N; ++y) {
@@ -38,85 +25,25 @@ static void rotgrv( const int N, const char b[MAX][MAX], char c[MAX][MAX] ) {
 }
 
 bool isK( const int N, const int K, const char t, const char p[MAX][MAX] ) {
-	for (int i=N-1; i>=0; --i) {
-		int n=0;
-		for (int j=0; j<N; ++j) {
-			char b = p[i][j];
-			if (t==b) {
-				++n;
-				if (K<=n) {
-					return true;
+	const struct{ int dx; int dy; } d[] = { {1,0}, {0,1}, {1,1}, {1,-1} };
+	for (int x=0; x<N; ++x) {
+		for (int y=0; y<N; ++y) {
+			if (t==p[x][y]) {
+				const int n = sizeof(d)/sizeof(d[0]);
+				for (int i=0; i<n; ++i) {
+					bool f = true;
+					for (int j=1; j<K; ++j) {
+						const int x_ = x+d[i].dx*j;
+						const int y_ = y+d[i].dy*j;
+						if (x_<0 || N<=x_ || y_<0 || N<=y_ || t!=p[x_][y_]) {
+							f = false;
+							break;
+						}
+					}
+					if (f) {
+						return true;
+					}
 				}
-			}
-			else {
-				n=0;
-			}
-		}
-		n=0;
-		for (int j=0; j<=i; ++j) {
-			char b = p[i-j][j];
-			if (t==b) {
-				++n;
-				if (K<=n) {
-					return true;
-				}
-			}
-			else {
-				n=0;
-			}
-		}
-		n=0;
-		for (int j=0; j<N-i; ++j) {
-			char b = p[i+j][j];
-			if (t==b) {
-				++n;
-				if (K<=n) {
-					return true;
-				}
-			}
-			else {
-				n=0;
-			}
-		}
-	}
-	for (int i=0; i<N; ++i) {
-		int n=0;
-		for (int j=N-1; j>=0; --j) {
-			char b = p[j][i];
-			if (t==b) {
-				++n;
-				if (K<=n) {
-					return true;
-				}
-			}
-			else {
-				n=0;
-			}
-		}
-		n=0;
-		for (int j=0; j<=i; ++j) {
-			char b = p[j][i-j];
-			if (t==b) {
-				++n;
-				if (K<=n) {
-					return true;
-				}
-			}
-			else {
-				n=0;
-			}
-		}
-		n=0;
-		for (int j=0; j<N-i; ++j) {
-			char b = p[j][i+j];
-			if (t==b) {
-				++n;
-				if (K<=n) {
-					return true;
-				}
-			}
-			else {
-				n=0;
 			}
 		}
 	}
@@ -160,5 +87,5 @@ int main () {
 	for (int x=1; x<=T; ++x) {
 		solve(x);
 	}
-    return 0;
+	return 0;
 }
