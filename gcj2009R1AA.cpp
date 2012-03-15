@@ -2,59 +2,43 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <set>
 
-using namespace std;
-
-set<unsigned long long> sHappy[11];
-set<unsigned long long> fHappy[11];
-static bool isHappy( const unsigned long long no, const int base ) {
-	set<unsigned long long> s;
-	bool happy=true;
-	unsigned long long n = no;
-	while (1!=n) {
-		if (sHappy[base].count(n)) {
-			break;
-		}
-		if (s.count(n)||fHappy[base].count(n)) {
-			happy=false;
-			break;
-		}
-		s.insert( n );
-		unsigned long long m=n;
-		n=0;
-		while (m>0) {
-			const unsigned long long t = m/base;
-			const unsigned long long d = m-t*base;
-			n += d*d;
-			m = t;
-		}
-	}
-	if (happy) {
-		sHappy[base].insert(s.begin(),s.end());
-	}
-	else {
-		fHappy[base].insert(s.begin(),s.end());
-	}
-
-	return happy;
+typedef unsigned long base_type;
+static int memo[11][20000000] = {};
+static int isHappy( const base_type no, const int base ) {
+    if (1==no) {
+        return 1;
+    }
+    if (memo[base][no]) {
+        return memo[base][no];
+    }
+    base_type m=no;
+    base_type n=0;
+    while (m>0) {
+        const base_type t = m%base;
+        n += t*t;
+        m /= base;
+    }
+    memo[base][no] = -1;
+	return memo[base][no] = isHappy(n,base);
 }
 
-static unsigned long long solve() {
-	string str;
-	getline(cin, str);
-	istringstream iss(str);
+static base_type solve() {
+	std::string str;
+	std::getline(std::cin, str);
+	std::istringstream iss(str);
 	int base;
-	vector<int> bases;
+	std::vector<int> bases;
 	while (iss >> base) {
 		bases.push_back( base );
 	}
-	unsigned long long no;
+    const int n = bases.size();
+	base_type no;
 	bool happy;
 	for(no=2; ;++no) {
 		happy = true;
-		for (int i=0; i<bases.size(); ++i) {
-			if (!isHappy(no, bases[i])) {
+		for (int i=0; i<n; ++i) {
+			if (-1==isHappy(no, bases[i])) {
 				happy = false;
 				break;
 			}
@@ -67,13 +51,13 @@ static unsigned long long solve() {
 }
 
 int main () {
-	string str;
-	getline(cin, str);
-	istringstream iss(str);
-    int T;
+	std::string str;
+	std::getline(std::cin, str);
+	std::istringstream iss(str);
+	int T;
 	iss >> T;
-	for (int i=0; i<T; ++i) {
-		cout << "Case #" << i+1 << ": " << solve() << "\n";
+	for (int i=1; i<=T; ++i) {
+		std::cout << "Case #" << i << ": " << solve() << "\n";
 	}
-    return 0;
+	return 0;
 }
