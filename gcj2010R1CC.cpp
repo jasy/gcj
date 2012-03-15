@@ -73,5 +73,5 @@ int main () {
 	for (int x=1; x<=T; ++x) {
 		solve( x );
 	}
-    return 0;
+	return 0;
 }
