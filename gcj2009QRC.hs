@@ -10,13 +10,8 @@ main = do
 solve (c:cs) = map f cs
   where
     t = "welcome to code jam"
-    format::Int->String
-    format = printf "%04d"
+    format = printf "%04d" ::Int->String
     f xs = format $ last $ g xs (1:replicate (length t) 0)
     g [] dp = dp
-    g (x:xs) (dp:dps) = g xs $ dp : h dp dps t
-      where
-        h p [] [] = []
-        h p (dp:dps) (s:ss) = n : h dp dps ss
-          where
-            n = if x==s then mod (p+dp) 10000 else dp
+    g (x:xs) (dp:dps) = g xs $ dp : zipWith3 h (dp:dps) dps t
+      where h p n s = if x/=s then n else mod (p+n) 10000
