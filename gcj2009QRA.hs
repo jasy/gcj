@@ -3,13 +3,17 @@ import Control.Monad
 import Text.Regex
 
 main = do
-  [l,d,n] <- getLine >>= return . map read . words
-  w <- replicateM d getLine
-  forM_ [1..n] $ \i -> do
-    l <- getLine
-    let r = mkRegex $ map cnvChar l
-    let m = length $ filter (isJust . (matchRegex r)) w
-    putStrLn $ "Case #"++show i++": "++show m
+  c <- liftM lines getContents
+  let ss = zipWith (\i r-> "Case #"++show i++": "++show r) [1..] $ solve c
+  mapM_ putStrLn ss
+
+solve (x:xs) = map f rs
+  where
+    [l,d,n] = map read $ words x
+    w = take d xs
+    ts = take n $ drop d xs
+    rs = map (mkRegex . (map cnvChar)) ts
+    f r = length $ filter (isJust . (matchRegex r)) w
 
 cnvChar '(' = '['
 cnvChar ')' = ']'
