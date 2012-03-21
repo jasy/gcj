@@ -27,7 +27,7 @@ static void calc( int num )
 	const double c = x*x + y*y + z*z;
 	const double b2_4ac = b*b - 4*a*c;
 	if (0 != a) {
-		if (0 == (b2_4ac)) {
+		if (0 <= (b2_4ac)) {
 			double sq = sqrt(b2_4ac);
 			double x1 = (-b-sq)/(2*a);
 			double x2 = (-b+sq)/(2*a);
