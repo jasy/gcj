@@ -3,53 +3,67 @@ import std.stdio, std.string, std.conv;
 import std.algorithm;
 import std.file;
 
-string[] dic;
+int[char][] trie;
+
+static this()
+{
+    trie.length=1;
+    foreach(w;readText("garbled_email_dictionary.txt").split())
+    {
+        auto cur = 0;
+        foreach(c;w)
+        {
+            if(c !in trie[cur])
+                trie[cur][c] = trie.length++.to!int();
+            cur = trie[cur][c];
+        }
+        trie[cur]['\0'] = 0;
+    }
+}
 
 auto solve()
 {
     enum D = 5;
     auto S = readln().chomp();
-    auto N = S.length;
-    auto dp = new int[D][N+1];
-    dp.fill(int.max);
+    auto dp = new int[int][D];
     dp[0][0]=0;
-    foreach(i,ref a;dp[0..$-1])
+    foreach(c;S)
     {
-        foreach(j,ref v;a)
+        auto dpn = new int[int][D];
+        foreach(j,v;dp)
         {
-            if(v==int.max) continue;
-            foreach(w;dic)
+            foreach(cur,mdf;v)
             {
-                auto n = w.length;
-                if(i+n>N) continue;
-                auto p = j;
-                auto m = 0;
-                foreach(k,c;w)
+                foreach(nc,ncur;trie[cur])
                 {
-                    if(c!=S[i+k])
+                    if('\0'==nc) continue;
+                    auto m = mdf;
+                    auto nj = j>0? j.to!int()-1: 0;
+                    if(nc!=c)
+                        if(j>0)
+                            continue;
+                        else
+                            ++m,nj=D-1;
+                    void reg(int nj, int ncur, int m)
                     {
-                        if(p>0)
-                        {
-                            p=D;
-                            break;
-                        }
-                        p=D;
-                        ++m;
+                        if(ncur in dpn[nj])
+                            dpn[nj][ncur] = min(dpn[nj][ncur],m);
+                        else
+                            dpn[nj][ncur] = m;
                     }
-                    if(p>0)
-                        --p;
+                    if('\0' in trie[ncur])
+                        reg(nj,0,m);
+                    reg(nj,ncur,m);
                 }
-                if(p>=D) continue;
-                dp[i+n][p] = min(dp[i+n][p],v+m);
             }
         }
+        dp.swap(dpn);
     }
-    return reduce!(min)(dp[N]);
+    return dp.map!(x=>0 in x? x[0]: int.max).reduce!(min);
 }
 
 void main()
 {
-    dic = readText("garbled_email_dictionary.txt").split();
     foreach(i;0..readln().chomp().to!int())
         writeln("Case #",i+1,": ",solve());
 }
