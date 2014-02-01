@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <functional>
-#include <numeric>
 #include <boost/multiprecision/cpp_int.hpp>
 
 static auto solve = []()
@@ -13,14 +11,11 @@ static auto solve = []()
     std::vector<mp::cpp_int> t(N);
     for(auto& v: t)
         std::cin >> v;
-    std::sort(t.begin(),t.end());
-    t.erase(std::unique(t.begin(),t.end()),t.end());
-    namespace ph = std::placeholders;
-    std::transform(t.begin()+1,t.end(),t.begin()+1,
-        std::bind(std::minus<mp::cpp_int>(),ph::_1,t[0]));
-    auto g = std::accumulate(t.begin()+1,t.end(),mp::cpp_int(0),
-        [](const mp::cpp_int& a, const mp::cpp_int& b){ return mp::gcd(a,b); });
-    return mp::cpp_int((g-t[0]%g)%g);
+    const auto m = *min_element(t.begin(),t.end());
+    mp::cpp_int g=0;
+    for(const auto& v: t)
+        g=mp::gcd(g,v-m);
+    return mp::cpp_int((g-m%g)%g);
 };
 
 int main()
