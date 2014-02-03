@@ -6,7 +6,7 @@ import re
 def solve(d):
     w = sys.stdin.readline().rstrip()
     r = re.compile(w.translate(string.maketrans("()","[]")))
-    return sum(map(lambda v: 1 if r.match(v)!=None else 0,d))
+    return len(filter(r.match,d))
 
 L,D,N = map(int,sys.stdin.readline().split())
 d = map(lambda x: sys.stdin.readline().rstrip(),range(D))
