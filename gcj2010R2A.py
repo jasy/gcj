@@ -1,10 +1,6 @@
 #!/usr/bin/env python
-import sys
 
-def solve():
-    k = int(sys.stdin.readline())
-    K = k*2-1
-    d = map(lambda _: sys.stdin.readline().rstrip(),range(K))
+def solve((k,K,d)):
     def dist(i): return abs(k-(i+1))
     def elegant(i,j):
         def inside(i,j): return 0<=i and i<K and dist(i)<=j and j<K-dist(i)
@@ -16,5 +12,13 @@ def solve():
     def diff(i,j): return (k+sum(map(dist,[i,j])))**2-k**2
     return min([diff(i,j) for i in range(K) for j in range(K) if elegant(i,j)])
 
-for x in range(int(sys.stdin.readline())):
-    print("Case #"+str(x+1)+": "+str(solve()))
+if __name__ == '__main__':
+    import sys
+    from multiprocessing import Pool, cpu_count
+    def getin():
+        k = int(sys.stdin.readline())
+        K = k*2-1
+        return (k,K,[sys.stdin.readline().rstrip() for _ in range(K)])
+    xs = [getin() for _ in range(int(sys.stdin.readline()))]
+    for i,x in enumerate(Pool(cpu_count()).map(solve,xs)):
+        print("Case #"+str(i+1)+": "+str(x))
