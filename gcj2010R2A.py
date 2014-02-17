@@ -4,7 +4,7 @@ def solve((k,K,d)):
     def dist(i): return abs(k-(i+1))
     def elegant(i,j):
         def inside(i,j): return 0<=i and i<K and dist(i)<=j and j<K-dist(i)
-        for x,y in [(x,y) for x in range(K) for y in range(K) if inside(x,y)]:
+        for x,y in [(x,y) for x in range(K) for y in range(dist(x),K-dist(x))]:
             for x1,y1 in [(x,j*2-y),(i*2-x,y)]:
                 if inside(x1,y1) and d[x][y]!=d[x1][y1]:
                     return False
@@ -14,11 +14,11 @@ def solve((k,K,d)):
 
 if __name__ == '__main__':
     import sys
-    from multiprocessing import Pool, cpu_count
+    from multiprocessing import Pool
     def getin():
         k = int(sys.stdin.readline())
         K = k*2-1
         return (k,K,[sys.stdin.readline().rstrip() for _ in range(K)])
     xs = [getin() for _ in range(int(sys.stdin.readline()))]
-    for i,x in enumerate(Pool(cpu_count()).map(solve,xs)):
+    for i,x in enumerate(Pool().imap(solve,xs)):
         print("Case #"+str(i+1)+": "+str(x))
