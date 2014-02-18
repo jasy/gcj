@@ -1,8 +1,13 @@
 #!/usr/bin/env python
-import sys
 
-def solve():
-    return "%.6f" % 0.0
+def solve(i):
+    return "%.6f" % i
 
-for x in range(int(sys.stdin.readline())):
-    print("Case #"+str(x+1)+": "+str(solve()))
+if __name__=='__main__':
+    from sys import stdin
+    def analyze(i):
+        return 0.0
+    xs = map(analyze,range(int(stdin.readline())))
+    from multiprocessing import Pool
+    for i,v in enumerate(Pool().imap(solve,xs)):
+        print("Case #"+str(i+1)+": "+str(v))
