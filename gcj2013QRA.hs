@@ -1,25 +1,14 @@
 #!/usr/bin/env runghc
 import Data.List
-
-main = do
-  c <- getContents
-  let ss = zipWith (\i r->"Case #"++show i++": "++r) [1..] $ solve (lines c)
-  mapM_ putStrLn ss
-
-solve (c:cs) = map res . take (read c) . analyze $ cs
-  where
-    res xs = 
-      if x then "X won"
-      else if o then "O won"
-      else if f then "Game has not completed"
-      else "Draw"
-      where
-        x = won xs 'X'
-        o = won xs 'O'
-        won xs c = or . map (and . map (\x->x==c || x=='T')) $ (xs++transpose xs++cross xs)
-          where
-            cross xs = [p [0..], p [3,2..]]
-              where p = zipWith (!!) xs
-        f = or . map (or . map (=='.')) $ xs
-    analyze [] = []
-    analyze xs = take 4 xs : analyze (drop 5 xs)
+import Data.List.Split
+main = getContents >>= mapM_ putStrLn . zipWith caseno [1..] . solve . lines
+caseno i r = "Case #"++show i++": "++r
+solve (c:cs) = map answer . take (read c) . analyze $ cs ::[String]
+analyze = map (take 4) . chunksOf 5
+answer xs
+  | won 'X' xs = "X won"
+  | won 'O' xs = "O won"
+  | any ('.' `elem`) xs = "Game has not completed"
+  | otherwise = "Draw"
+won c xs = any (all (`elem` [c,'T'])) $ concatMap ($xs) [id,transpose,cross]
+cross xs = map (zipWith (!!) xs) [[0..],[3,2..]]
