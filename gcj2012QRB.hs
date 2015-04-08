@@ -1,19 +1,13 @@
 #!/usr/bin/env runghc
-import Control.Monad
+import Control.Arrow
 import Data.List
-
-main = do
-  c <- liftM lines getContents
-  let ss = zipWith (\i r->"Case #"++show i++": "++r) [1..] $ solve c
-  mapM_ putStrLn ss
-
-solve (c:cs) = map u $ analyze cs
-  where
-    u (n:s:p:tx) = show $ nsn + min s sn
-      where
-        mns = (p-1)*3+1
-        ms = if p<2 then p else (p-2)*3+2
-        (nsg,sg) = partition (>=mns) tx
-        nsn = length nsg
-        sn = length $ filter (>=ms) sg
-    analyze = map $ map read . words
+main = mapM_ putStrLn . zipWith caseno [1..] . solve . lines =<< getContents
+caseno i r = "Case #"++show i++": "++r
+solve (c:cs) = map (toString . answer) . take (read c) . analyze $ cs ::[String]
+analyze = map $ map read . words
+toString = show
+answer (n:s:p:ts) = count . assort $ ts where
+  count = uncurry (+) . (length *** (min s . length))
+  assort = partition (>=hi) . filter (>=lo) where
+    lo = (max 0 (p-2))*2+p
+    hi = (max 0 (p-1))*2+p
