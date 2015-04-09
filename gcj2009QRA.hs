@@ -1,23 +1,15 @@
 #!/usr/bin/env runghc
-import Control.Monad
 import Text.Regex
-
-main = do
-  c <- liftM lines getContents
-  let ss = zipWith (\i r-> "Case #"++show i++": "++show r) [1..] $ solve c
-  mapM_ putStrLn ss
-
-solve (x:xs) = map f rs
-  where
-    [l,d,n] = map read $ words x
-    w = take d xs
-    ts = take n $ drop d xs
-    rs = map (mkRegex . (map cnvChar)) ts
-    f r = length $ filter (isJust . (matchRegex r)) w
-
+import Data.Maybe
+import Control.Arrow
+main = mapM_ putStrLn . zipWith caseno [1..] . solve . lines =<< getContents
+caseno i r = "Case #"++show i++": "++r
+toString = show
+solve (x:xs) = map (toString . answer) ts where
+  [l,d,n] = map read $ words x
+  (ws,ts) = second (take n) $ splitAt d xs
+  answer t = length . flip filter ws $ isJust . matchRegex (cnvRegex t)
+cnvRegex = mkRegex . map cnvChar
 cnvChar '(' = '['
 cnvChar ')' = ']'
 cnvChar x = x
-
-isJust (Just _) = True
-isJust Nothing = False
