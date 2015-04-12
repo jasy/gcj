@@ -11,5 +11,5 @@ answer [x,r,c]
   | x > max r c = False
   | (x+1)`div`2 > min r c = False
   | x<=3 = True
-  | (x+1)`div`2 == min r c && r*c`div`x<=2 = False
+  | (x+1)`div`2 == min r c && (r*c`div`x<=3 || gcd x (min r c)/=1) = False
   | otherwise = True
