@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <cassert>
 
 enum Q{
@@ -63,25 +62,12 @@ static auto solve = []()
         {
             c = q[k%L]*c;
             if(c!=Q_k) continue;
-            long long s=i+1, e=X*L-(L*N-k);
-            if(s>=e) break;
+            if((i+1)+(L*N-k) >= X*L) break;
+            Q d=Q_1;
+            for(int j=0; j<L; ++j) d = d*q[j];
             Q b=Q_1;
-            const auto se = std::min(e,(s+L-1)/L*L);
-            for( ; s<se; ++s) b = b*q[s%L];
-            {
-                Q d=Q_1;
-                for(int j=0; j<L; ++j) d = d*q[j];
-                long long p = (e-s)/L;
-                s += p*L;
-                while(p>0)
-                {
-                    if(p&1) b=b*d;
-                    d=d*d;
-                    p>>=1;
-                }
-            }
-            for( ; s<e; ++s) b = b*q[s%L];
-            if(b==Q_j) return "YES";
+            for(int j=0; j<X%N; ++j) b = b*d;
+            if(b==Q_i*Q_j*Q_k) return "YES";
             break;
         }
         break;
