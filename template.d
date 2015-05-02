@@ -8,6 +8,6 @@ auto solve()
 
 void main()
 {
-    foreach(i;0..readln().chomp().to!int())
+    foreach(i;0..readln.chomp.to!int())
         writeln("Case #",i+1,": ",solve());
 }
