@@ -1,7 +1,8 @@
 #!/usr/bin/env rdmd -O
 import std.stdio, std.string, std.conv;
 import std.algorithm, std.array, std.range;
-import std.typecons;
+import std.container, std.typecons;
+import std.math;
 
 auto solve()
 {
@@ -14,11 +15,22 @@ auto solve()
         immutable D=DHM[0], H=DHM[1], M=DHM[2];
         foreach(i;0..H) h~=T(D,M+i);
     }
-    if(h.length>2) return -1;
-    if(h.length<2) return 0;
-    if(h[0].M*(720L-h[0].D)<=h[1].M*(360L-h[1].D)) return 1;
-    if(h[1].M*(720L-h[1].D)<=h[0].M*(360L-h[0].D)) return 1;
-    return 0;
+    alias Tuple!(long,"t",size_t,"i") V;
+    BinaryHeap!(Array!V,"a>b") q;
+    foreach(i,v;h) q.insert(V(v.M*(360L-v.D),i));
+    ulong m = h.length;
+    foreach(_;0..h.length*2)
+    {
+        with(q.front)
+        {
+            ulong c=0;
+            foreach(v;h)
+                c += abs(t/v.M/360 + (t/v.M%360>=(360-v.D)?0:-1));
+            m=min(m,c);
+            q.replaceFront(V(t+h[i].M*360L,i));
+        }
+    }
+    return m;
 }
 
 void main()
