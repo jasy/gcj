@@ -8,18 +8,18 @@ auto solve()
     immutable K=kls[0], L=kls[1], S=kls[2];
     immutable KS = readln.chomp;
     immutable LS = readln.chomp;
-    auto ks = new char[S];
-    int n=0,m=0;
-    foreach(b_;0..K^^S)
+    int[26] kn;
+    foreach(c;KS) ++kn[c-'A'];
+    real p=0;
+    if(LS.all!(c=>kn[c-'A']!=0))
     {
-        auto b=b_;
-        foreach_reverse(ref k;ks) k=KS[b%K],b/=K;
-        int c=0;
-        foreach(i;0..S-L+1) if(ks[i..i+L]==LS) ++c;
-        m=max(m,c);
-        n+=c;
+        p=S-L+1;
+        foreach(c;LS) p=p*kn[c-'A']/K;
+        int m=0;
+        foreach(i;1..L) if(LS[0..i]==LS[$-i..$]) m=i;
+        p = (S-L)/(L-m)+1 - p;
     }
-    return format("%.7f",m-n*1.0/K^^S);
+    return format("%.7f",p);
 }
 
 void main()
