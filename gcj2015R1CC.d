@@ -1,26 +1,16 @@
 #!/usr/bin/env rdmd -O
 import std.stdio, std.string, std.conv;
 import std.algorithm, std.array, std.range;
-import core.bitop;
 
 auto solve()
 {
-    auto cdv = readln.split.map!(to!int);
+    auto cdv = readln.split.map!(to!long);
     immutable C=cdv[0], D=cdv[1], V=cdv[2];
-    immutable d=readln.split.map!(to!int).array().idup;
-    if(C!=1 || V>30) return -1;
-    size_t u = 1;
-    foreach(v;d)
-        foreach_reverse(i;0..V-v+1)
-            u |= (u>>i&1)<<(i+v);
+    auto d=readln.split.map!(to!long).array();
     int n=0;
-    while(u!=(1<<(V+1))-1)
-    {
-        ++n;
-        auto v=bsf(~u);
-        foreach_reverse(i;0..V-v+1)
-            u |= (u>>i&1)<<(i+v);
-    }
+    for(long m=0; m<V; )
+        if(d.length==0 || d.front>m+1) m+=(m+1)*C, ++n;
+        else m+=d.front*C, d.popFront();
     return n;
 }
 
