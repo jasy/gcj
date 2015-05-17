@@ -15,19 +15,16 @@ auto solve()
         immutable D=DHM[0], H=DHM[1], M=DHM[2];
         foreach(i;0..H) h~=T(D,M+i);
     }
-    alias Tuple!(long,"t",size_t,"i") V;
+    alias Tuple!(long,"t",int,"r",int,"i") V;
     BinaryHeap!(Array!V,"a>b") q;
-    foreach(i,v;h) q.insert(V(v.M*(360L-v.D),i));
-    ulong m = h.length;
+    foreach(int i,v;h) q.insert(V(v.M*(360L-v.D),1,i));
+    ulong m = h.length, c=m;
     foreach(_;0..h.length*2)
     {
         with(q.front)
         {
-            ulong c=0;
-            foreach(v;h)
-                c += abs(t/v.M/360 + (t/v.M%360>=(360-v.D)?0:-1));
-            m=min(m,c);
-            q.replaceFront(V(t+h[i].M*360L,i));
+            m=min(m,c+=r>0?-1:1);
+            q.replaceFront(V(t+h[i].M*360L,r-1,i));
         }
     }
     return m;
