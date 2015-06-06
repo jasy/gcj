@@ -95,10 +95,7 @@ static auto solve()
     auto wvo = [N](int n){ return n*2+1+N; };
     std::vector<Edge> edges;
     for(int i=0; i<c; ++i)
-    {
         edges.emplace_back(1,wvi(i),wvo(i));
-        edges.emplace_back(1,wvo(i),wvi(i));
-    }
     for(int i=0; i<N; ++i)
     {
         auto&a=ss[i];
