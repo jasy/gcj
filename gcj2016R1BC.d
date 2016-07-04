@@ -1,33 +1,49 @@
 #!/usr/bin/env rdmd -O
 import std.stdio, std.string, std.conv;
 import std.algorithm, std.array;
-import core.bitop;
 
 auto solve()
 {
     immutable N = readln.chomp.to!int();
     auto topics = new string[2][N];
     foreach(ref a;topics) a=readln.split.array();
-    int m=0;
-    foreach(b;0..1<<N)
+    auto words = new int[string][2]; 
+    foreach(i,ref a;topics)
+        foreach(j,ref w; a)
+            if(w !in words[j])
+                words[j][w]=words[j].length.to!int();
+    immutable M = words.map!(x=>x.length.to!int()).sum();
+    auto g = new int[][M];
+    foreach(ref a; topics)
     {
-        bool f=false;
-        bool[string] words1;
-        bool[string] words2;
-        foreach(i,ref a;topics) if(!(b>>i&1))
-        {
-            words1[a[0]]=true;
-            words2[a[1]]=true;
-        }
-        foreach(i,ref a;topics) if(b>>i&1)
-        {
-            f = a[0] !in words1 || a[1] !in words2;
-            if(f) break;
-        }
-        if(f) continue;
-        m=max(m,_popcnt(b));
+        immutable v=words[0][a[0]];
+        immutable w=words[1][a[1]]+words[0].length.to!int();
+        g[v]~=w;
+        g[w]~=v;
     }
-    return m;
+    auto match = new int[M]; match[]=M;
+    auto used = new bool[M];
+    bool dfs(int v){
+        used[v]=true;
+        foreach(u; g[v]){
+            immutable w = match[u];
+            if(w==M || (!used[w] && dfs(w))){
+                match[v]=u;
+                match[u]=v;
+                return true;
+            }
+        }
+        return false;
+    }
+    int c=0;
+    foreach(v; 0..M) if(match[v]==M)
+    {
+        used[]=false;
+        if(dfs(v))
+            ++c;
+    }
+    foreach(v; 0..M) if(match[v]==M) ++c;
+    return N-c;
 }
 
 void main()
