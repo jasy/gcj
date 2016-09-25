@@ -1,64 +1,46 @@
 #!/usr/bin/env rdmd -O
 import std.stdio, std.string, std.conv;
 import std.algorithm, std.array, std.range;
-
-// Union Find
-class UnionFind(T)
-{
-    T[] p,r;
-    T find(const T x){ return x==p[x]? x: (p[x]=find(p[x])); }
-public:
-    this(const T n)
-    {
-        r=new T[n];
-        p=iota(T(n)).array();
-    }
-    bool same(const T x, const T y){ return find(x)==find(y); }
-    void unite(T x, T y)
-    {
-        x=find(x);
-        y=find(y);
-        if(x==y) return;
-        if(r[x]>r[y]) swap(x,y);
-        else if(r[x]==r[y]) ++r[y];
-        p[x]=y;
-    }
-};
+import std.typecons;
 
 auto solve()
 {
     auto RC = readln.split.map!(to!int);
     immutable R=RC[0], C=RC[1];
     immutable p=readln.split.map!(x=>x.to!int()-1).array();
-    immutable B=(R+1)*C;
-    immutable N = (R+1)*C+R*(C+1);
-    auto q=new int[]((R+C)*2);
-    foreach(i;0..C) q[i]=i;
-    foreach(j;0..R) q[j+C]=C+j*(C+1)+B;
-    foreach(i;0..C) q[i+C+R]=B-1-i;
-    foreach(j;0..R) q[j+C+R+C]=(R-1-j)*(C+1)+B;
-    foreach(b;0..1<<R*C)
-    {
-        auto uf=new UnionFind!(int)(N);
-        foreach(r;0..R) foreach(c;0..C)
-        {
-            immutable m=r*C+c;
-            immutable int[2] u=[r*C+c,(r+1)*C+c];
-            immutable int[2] s=[r*(C+1)+c+B,r*(C+1)+c+1+B];
-            immutable v=b>>m&1;
-            uf.unite(u[0],s[v]);
-            uf.unite(u[1],s[1-v]);
-        }
-        bool f=true;
-        foreach(i;0..(C+R))
-            if(!uf.same(q[p[i*2]],q[p[i*2+1]])){f=false; break;}
-        if(!f) continue;
-        auto g=new string[](R+1);
-        foreach(r;0..R) foreach(c;0..C)
-            g[r+1]~="/\\"[b>>(r*C+c)&1];
-        return g.join("\n");
+    immutable N2=R+C, N=N2*2;
+    alias Tuple!(int,"s",int,"e") T;
+    auto dist(T v) { return (v.e-v.s+N)%N; }
+    auto se = new T[N2];
+    foreach(i,ref v;se) {
+        v.s=p[i*2], v.e=p[i*2+1];
+        if(dist(v)>N2) swap(v.s,v.e);
     }
-    return "\nIMPOSSIBLE";
+    se.sort!((x,y)=>dist(x)<dist(y))();
+    immutable char E = '*';
+    auto g = new char[][](R,C);
+    foreach(ref a;g) a[]=E;
+    foreach(v;se) {
+        int x,y,dx,dy;
+        void pos(int i) {
+            if(i<C) x=i, y=-1, dx=0, dy=1;
+            else if(i<C+R) x=C, y=i-C, dx=-1, dy=0;
+            else if(i<C+R+C) x=C-(i-(C+R))-1, y=R, dx=0, dy=-1;
+            else x=-1, y=R-(i-(C+R+C))-1, dx=1, dy=0;
+        }
+        pos(v.s); x+=dx; y+=dy;
+        while(0<=x && x<C && 0<=y && y<R) {
+            if(g[y][x]==E) g[y][x]="/\\"[dx?0:1];
+            swap(dx,dy);
+            if(g[y][x]=='/') dx*=-1, dy*=-1;
+            x+=dx; y+=dy;
+        }
+        immutable px=x, py=y;
+        pos(v.e);
+        if(px!=x || py!=y) return "\nIMPOSSIBLE";
+    }
+    foreach(ref a;g) foreach(ref c;a) if(c==E) c='/';
+    return "\n"~g.map!(to!string).join("\n");
 }
 
 void main()
