@@ -12,7 +12,7 @@ void input(ref IN c_) {with(c_){
     N=m[0]; R=m[1], O=m[2], Y=m[3], G=m[4], B=m[5], V=m[6];
 }}
 
-string solve(ulong no,IN c_) {with(c_){
+string solve(IN c_) {with(c_){
     immutable IMPOSSIBLE = "IMPOSSIBLE";
     if(G>R) return IMPOSSIBLE;
     if(O>B) return IMPOSSIBLE;
@@ -34,18 +34,6 @@ string solve(ulong no,IN c_) {with(c_){
         return s.to!string();
     }
     int k=0;
-    if(R!=0 && R==G) {
-        for(;k<R+G;++k) s[k]=(k&1)?'R':'G';
-        R=0;G=0;
-    }
-    if(Y!=0 && Y==V) {
-        for(;k<Y+V;++k) s[k]=(k&1)?'Y':'V';
-        Y=0;V=0;
-    }
-    if(B!=0 && B==O) {
-        for(;k<B+O;++k) s[k]=(k&1)?'B':'O';
-        B=0;O=0;
-    }
     auto n = [R-G, Y-V, B-O];
     auto u = [false,false,false];
     int f=-1,l=-1;
@@ -85,8 +73,6 @@ string solve(ulong no,IN c_) {with(c_){
 void main() {
     auto cs = new IN[readln.chomp.to!int()];
     foreach(ref c_;cs) input(c_);
-    //foreach(i,a;taskPool.amap!solve(cs))
-    //    writeln("Case #",i+1,": ",a);
-    foreach(i,ref c_;cs)
-        writeln("Case #",i+1,": ",solve(i+1,c_));
+    foreach(i,a;taskPool.amap!solve(cs))
+        writeln("Case #",i+1,": ",a);
 }
