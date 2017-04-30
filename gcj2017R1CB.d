@@ -2,6 +2,7 @@
 import std.stdio, std.string, std.conv;
 import std.algorithm, std.array, std.range;
 import std.parallelism;
+import std.typecons;
 
 struct IN {
     int Ac, Aj;
@@ -18,24 +19,31 @@ void input(ref IN c_) {with(c_){
     foreach(ref a; JK) a = readln.split.map!(to!int).array();
 }}
 
-auto calc(ref int[2][] CD) {
-    if(CD.length==1) {
-        return 2;
-    }
-    if(CD[0][0]>CD[1][0]) swap(CD[0],CD[1]);
-    if(CD[1][0]-CD[0][1]>=12*60) return 2;
-    if(CD[1][1]-CD[0][0]<=12*60) return 2;
-    return 4;
-}
 auto solve(IN c_) {with(c_){
-    if(Ac+Aj>2) return -1;
-    if(Aj==0) {
-        return calc(CD);
+    size_t n = Ac+Aj;
+    if(n<2) return 2;
+    alias Tuple!(int,"b",int,"e",int,"p") T;
+    T[] s; s.reserve(n);
+    auto t = [0,0];
+    foreach(ref a;CD) t[0]+=a[1]-a[0], s~=T(a[0],a[1],0);
+    foreach(ref a;JK) t[1]+=a[1]-a[0], s~=T(a[0],a[1],1);
+    s = s.sort().array();
+    auto p = new int[][2];
+    foreach(i,ref v;s) {
+        auto w = s[(i+1)%$];
+        if(v.p==w.p) p[v.p]~=(w.b-v.e+24*60)%(24*60);
     }
-    if(Ac==0) {
-        return calc(JK);
+    foreach(i,q;p) {
+        foreach(k,v;q.sort().array()) {
+            if(t[i]+v>12*60) {
+                n+=q.length-k;
+                break;
+            }
+            t[i]+=v;
+            --n;
+        }
     }
-    return 2;
+    return n;
 }}
 
 void main() {
