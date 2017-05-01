@@ -17,19 +17,27 @@ void input(ref IN c_) {with(c_){
 }}
 
 auto solve(IN c_) {with(c_){
-    P.sort; P~=1.0;
-    real p=0.0;
-    foreach(i,v;P) {
-        immutable t = (v-p)*i;
-        if(t>U) foreach(j,ref w;P[0..i]) w+=U/i;
-        else    foreach(j,ref w;P[0..i]) w=v;
-        U-=t;
-        if(U<=0) break;
-        p=v;
+    P=P.sort().array();
+    real m=0.0;
+    auto dp = new real[N+1];
+    foreach(s;0..N) {
+        real lo=0,hi=1,r=0;
+        foreach(_;0..100) {
+            immutable mi=(lo+hi)/2;
+            immutable t=P[s..$].map!(v=>max(0,mi-v)).sum();
+            if(t>U) hi=mi;
+            else lo=mi, r=U-t;
+        }
+        dp[]=0;
+        dp[0]=1.0;
+        foreach(i;0..N) {
+            immutable q = i>=s? max(lo,P[i]): (i!=s-1? P[i]: min(1,P[i]+r));
+            foreach_reverse(j;0..i+1) dp[j+1]=dp[j]*q+dp[j+1]*(1-q);
+            dp[0]*=1-q;
+        }
+        m=max(m,dp[K..$].sum());
     }
-    real x=1.0;
-    foreach(v;P) x*=v;
-    return format("%.6f",x);
+    return format("%.6f",m);
 }}
 
 void main() {
