@@ -16,22 +16,29 @@ void input(ref IN c_) {with(c_){
 }}
 
 auto solve(IN c_) {with(c_){
-    if(C!=2) return "-1 -1";
     auto t = new int[](C);
     auto c = new int[](N);
     foreach(ref a;PB) ++t[a[1]-1], ++c[a[0]-1];
     int r=t.reduce!max();
-    int p=0;
+    int e=0;
     foreach(i,s;c) {
         if(s>r) {
-            if(i==0) {
-                r=s;
+            immutable a=s-r;
+            if(e<a) {
+                immutable q=(a-e+i)/(i+1);
+                e+=q*(i+1)-a;
+                r+=q;
             }
             else {
-                p+=s-r;
+                e-=a;
             }
         }
+        else {
+            e+=r-s;
+        }
     }
+    int p=0;
+    foreach(i,s;c) if(s>r) p+=s-r;
     return [r,p].map!(to!string).join(" ");
 }}
 
